@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${course.id == null ? 'Add Course' : 'Edit Course'} + ' - Student Management System'">Add/Edit Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Student Management System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/students}">Students</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/courses}">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/users/list}">Users</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <span class="nav-item nav-link text-light" th:text="${#authentication.name}">admin</span>
+                    <form class="nav-item" th:action="@{/logout}" method="post">
+                        <button class="btn btn-outline-light" type="submit">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 th:text="${course.id == null ? 'Add New Course' : 'Edit Course'}">Add/Edit Course</h2>
+            <a th:href="@{/courses}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Courses
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${course.id == null} ? @{/courses/add} : @{/courses/edit/{id}(id=${course.id})}" 
+                      th:object="${course}" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="courseCode" class="form-label">Course Code</label>
+                            <input type="text" class="form-control" id="courseCode" th:field="*{courseCode}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="courseName" class="form-label">Course Name</label>
+                            <input type="text" class="form-control" id="courseName" th:field="*{courseName}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="credits" class="form-label">Credits</label>
+                            <input type="number" class="form-control" id="credits" th:field="*{credits}" required min="1" max="6">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="maxStudents" class="form-label">Max Students</label>
+                            <input type="number" class="form-control" id="maxStudents" th:field="*{maxStudents}" min="1">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="instructor" class="form-label">Instructor</label>
+                            <input type="text" class="form-control" id="instructor" th:field="*{instructor}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="semester" class="form-label">Semester</label>
+                            <select class="form-select" id="semester" th:field="*{semester}">
+                                <option value="">Select Semester</option>
+                                <option value="Fall">Fall</option>
+                                <option value="Spring">Spring</option>
+                                <option value="Summer">Summer</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="academicYear" class="form-label">Academic Year</label>
+                            <input type="text" class="form-control" id="academicYear" th:field="*{academicYear}" placeholder="e.g. 2023-2024">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" th:field="*{status}">
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a th:href="@{/courses}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
