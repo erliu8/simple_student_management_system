@@ -1,7 +1,8 @@
 # Student Management System
 
 A comprehensive student management system built with Spring Boot, featuring role-based access control, student information management, course management, and grade tracking
-＃☆For practice and reference only for computer science students
+
+☆For practice and reference only for computer science students
 
 ## Features
 
