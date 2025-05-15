@@ -1,26 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册 - 学生管理系统</title>
+    <title>Edit User - Student Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link th:href="@{/css/main.css}" rel="stylesheet">
     <style>
-        body {
-            background-color: #f5f5f5;
-            display: flex;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .register-container {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-        }
         .error-message {
             color: red;
             font-size: 0.8rem;
@@ -36,14 +25,6 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             padding: 1.5rem;
-        }
-        .btn-primary {
-            background-color: #343a40;
-            border-color: #343a40;
-        }
-        .btn-primary:hover {
-            background-color: #23272b;
-            border-color: #23272b;
         }
         .field-error {
             border-color: #dc3545 !important;
@@ -64,10 +45,48 @@
     </style>
 </head>
 <body>
-    <div class="container register-container">
-                <div class="card">
-                    <div class="card-header">
-                <h3 class="text-center mb-0">用户注册</h3>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Student Management System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/students}">Students</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/courses}">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/users/list}">Users</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <span class="nav-item nav-link text-light" th:text="${#authentication.name}">admin</span>
+                    <form class="nav-item" th:action="@{/logout}" method="post">
+                        <button class="btn btn-outline-light" type="submit">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Edit User</h2>
+            <a th:href="@{/users/list}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Users List
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Edit User Information</h4>
             </div>
             <div class="card-body">
                 <!-- 显示错误消息 -->
@@ -91,7 +110,8 @@
                     </div>
                 </div>
                 
-                <form th:action="@{/register}" th:object="${user}" method="post" id="registrationForm" autocomplete="off">
+                <!-- 表单 -->
+                <form th:action="@{/users/edit/{id}(id=${user.id})}" th:object="${user}" method="post" id="editUserForm" autocomplete="off">
                     <!-- 隐藏表单键字段，用于防止浏览器缓存 -->
                     <input type="hidden" name="v" th:value="${formKey}">
                     
@@ -108,28 +128,6 @@
                         <small class="form-text text-muted">用户名长度必须在3~15位之间，只能是字母加数字的组合，但不能是纯数字</small>
                         <div class="error-message" id="username-error" th:if="${usernameError != null}">用户名已存在，请选择其他用户名</div>
                     </div>
-                    
-                    <!-- 密码 -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label">密码</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                            <input type="password" class="form-control" th:id="'password_' + ${formKey}" th:name="'password'" th:field="*{password}" required>
-                            </div>
-                        <small class="form-text text-muted">密码长度至少6个字符</small>
-                                <div class="error-message" id="password-error"></div>
-                            </div>
-                    
-                    <!-- 确认密码 -->
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">确认密码</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                            <input type="password" class="form-control" th:id="'confirmPassword_' + ${formKey}" name="confirmPassword" required>
-                        </div>
-                        <small class="form-text text-muted">请再次输入密码</small>
-                                <div class="error-message" id="confirmPassword-error"></div>
-                            </div>
                     
                     <!-- 姓名 -->
                     <div class="mb-3">
@@ -149,9 +147,9 @@
                                    th:name="'email'" th:field="*{email}" required
                                    th:classappend="${emailError != null} ? 'field-error' : ''"
                                    th:placeholder="${emailError != null} ? '请输入新的邮箱地址' : '请输入有效的邮箱地址'">
-                            </div>
+                        </div>
                         <div class="error-message" id="email-error" th:if="${emailError != null}">邮箱已被注册，请使用其他邮箱</div>
-                            </div>
+                    </div>
                     
                     <!-- 身份证号 -->
                     <div class="mb-3">
@@ -162,10 +160,10 @@
                                    th:name="'idCard'" th:field="*{idCard}" required maxlength="18"
                                    th:classappend="${idCardError != null} ? 'field-error' : ''"
                                    th:placeholder="${idCardError != null} ? '请输入新的身份证号' : '请输入18位身份证号码'">
-                            </div>
-                        <small class="form-text text-muted">请输入18位身份证号码：不能以0开头，前17位必须都是数字，最后一位可以是数字或X</small>
+                        </div>
+                        <small class="form-text text-muted">请输入18位身份证号码</small>
                         <div class="error-message" id="idCard-error" th:if="${idCardError != null}">该身份证号已被注册</div>
-                            </div>
+                    </div>
                     
                     <!-- 手机号 -->
                     <div class="mb-3">
@@ -177,15 +175,50 @@
                                    th:classappend="${phoneError != null} ? 'field-error' : ''"
                                    th:placeholder="${phoneError != null} ? '请输入新的手机号' : '请输入11位手机号码'">
                         </div>
-                        <small class="form-text text-muted">请输入11位手机号码：不能以0开头，必须都是数字</small>
+                        <small class="form-text text-muted">请输入11位手机号码</small>
                         <div class="error-message" id="phone-error" th:if="${phoneError != null}">该手机号已被注册，请使用其他手机号</div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 py-2 mt-3" id="submitBtn">注册</button>
+                    <!-- 用户角色 -->
+                    <div class="mb-3">
+                        <label class="form-label">用户角色</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" th:id="'role_admin_' + ${formKey}" 
+                                       name="roles" value="ROLE_ADMIN" 
+                                       th:checked="${#lists.contains(user.roles, 'ROLE_ADMIN')}">
+                                <label class="form-check-label" th:for="'role_admin_' + ${formKey}">管理员</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" th:id="'role_teacher_' + ${formKey}" 
+                                       name="roles" value="ROLE_TEACHER" 
+                                       th:checked="${#lists.contains(user.roles, 'ROLE_TEACHER')}">
+                                <label class="form-check-label" th:for="'role_teacher_' + ${formKey}">教师</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" th:id="'role_student_' + ${formKey}" 
+                                       name="roles" value="ROLE_STUDENT" 
+                                       th:checked="${#lists.contains(user.roles, 'ROLE_STUDENT')}">
+                                <label class="form-check-label" th:for="'role_student_' + ${formKey}">学生</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 用户状态 -->
+                    <div class="mb-3">
+                        <label class="form-label">用户状态</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" 
+                                   th:id="'enabled_' + ${formKey}" name="enabled" th:checked="*{enabled}">
+                            <label class="form-check-label" th:for="'enabled_' + ${formKey}">账户激活</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/users/list}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">保存修改</button>
+                    </div>
                 </form>
-                <div class="text-center mt-3">
-                    <a th:href="@{/login}" id="loginLink">已有账号？点击登录</a>
-                </div>
             </div>
         </div>
     </div>
@@ -193,9 +226,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Registration page loaded');
+            console.log('Edit user page loaded');
             
-            const form = document.getElementById('registrationForm');
+            const form = document.getElementById('editUserForm');
             const submitBtn = document.getElementById('submitBtn');
             
             // 记录所有需要被清除和重新填写的错误字段
@@ -210,7 +243,7 @@
                 errorFields.forEach((field, index) => {
                     // 添加到错误字段列表
                     allErrorFields.push(field);
-            
+                    
                     // 为错误字段添加震动效果，提高用户注意力
                     field.classList.add('animate__animated', 'animate__shakeX');
                     
@@ -225,7 +258,7 @@
                             setTimeout(() => {
                                 field.focus();
                             }, index * 300); // 为每个字段添加递增延迟
-                } else {
+                        } else {
                             // 单个错误情况，只聚焦第一个字段
                             if (index === 0) {
                                 setTimeout(() => {
@@ -269,69 +302,13 @@
                             const errorElement = document.getElementById(fieldName + '-error');
                             if (errorElement) {
                                 errorElement.style.display = 'none';
-                }
+                            }
                             
                             // 检查是否所有错误字段都已经修改
                             checkAllErrorsFixed();
                         });
                     });
                 }, 1000);
-                
-                // 添加焦点循环功能 - 在多重错误情况下特别有用
-                if (hasMultipleErrors && errorFields.length > 1) {
-                    // 允许用户通过Tab键在错误字段之间循环导航
-                    errorFields.forEach(field => {
-                        field.addEventListener('keydown', function(e) {
-                            // 如果按下Tab键并且按住了Shift键
-                            if (e.key === 'Tab' && e.shiftKey) {
-                                // 找到当前错误字段的索引
-                                const currentIndex = Array.from(errorFields).indexOf(this);
-                                // 计算上一个错误字段的索引（循环回到末尾）
-                                const prevIndex = (currentIndex - 1 + errorFields.length) % errorFields.length;
-                                
-                                // 如果需要切换到上一个错误字段
-                                if (currentIndex !== prevIndex) {
-                                    e.preventDefault();
-                                    errorFields[prevIndex].focus();
-                                }
-                            } 
-                            // 如果只按下了Tab键
-                            else if (e.key === 'Tab' && !e.shiftKey) {
-                                // 找到当前错误字段的索引
-                                const currentIndex = Array.from(errorFields).indexOf(this);
-                                // 计算下一个错误字段的索引（循环回到开头）
-                                const nextIndex = (currentIndex + 1) % errorFields.length;
-                                
-                                // 如果需要切换到下一个错误字段
-                                if (currentIndex !== nextIndex) {
-                                    e.preventDefault();
-                                    errorFields[nextIndex].focus();
-                                }
-                            }
-                        });
-                    });
-                }
-            }
-            
-            // 创建清晰的步骤指导提示
-            if (allErrorFields.length > 0 && !hasMultipleErrors) {
-                const cardBody = form.closest('.card-body');
-                const stepGuide = document.createElement('div');
-                stepGuide.className = 'alert alert-info mt-3 mb-4';
-                stepGuide.innerHTML = `
-                    <h6 class="alert-heading"><i class="bi bi-info-circle"></i> 请修改以下信息:</h6>
-                    <ol class="mb-0">
-                        ${errorFields.length > 1 ? 
-                          '<li>请先修改第一个错误字段，然后继续修改其他标记的错误字段</li>' : 
-                          '<li>请修改标记的错误字段</li>'}
-                        <li>修改完成后重新提交表单</li>
-                    </ol>
-                `;
-            
-                // 在表单上方插入步骤指导
-                if (!hasMultipleErrors) {
-                    cardBody.insertBefore(stepGuide, cardBody.firstChild.nextSibling);
-                }
             }
             
             // 检查是否所有错误字段都已经修改
@@ -356,7 +333,7 @@
                     
                     // 将提交按钮滚动到视图中
                     submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
+                    
                     // 突出显示提交按钮
                     submitBtn.classList.add('animate__animated', 'animate__pulse');
                     setTimeout(() => {
@@ -367,88 +344,20 @@
             
             // 表单提交时显示加载状态
             form.addEventListener('submit', function(event) {
-                // 先进行基本验证
-                if (!validateForm()) {
-                    event.preventDefault();
-                    return false;
-                }
-                
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 提交中...';
                 submitBtn.disabled = true;
-                
-                // 添加短暂延迟，让用户感知到表单正在提交
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-                
-                return true;
             });
             
-            // 基本的前端验证功能
-            function setupFormValidation() {
-                const passwordInput = document.querySelector('input[name="password"]');
-                const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
-                const usernameInput = document.querySelector('input[name="username"]');
-                const idCardInput = document.querySelector('input[name="idCard"]');
-                const phoneInput = document.querySelector('input[name="phone"]');
-                const emailInput = document.querySelector('input[name="email"]');
-            
-                // 确认密码验证
-                confirmPasswordInput.addEventListener('input', function() {
-                    const passwordError = document.getElementById('confirmPassword-error');
-                    if (this.value !== passwordInput.value) {
-                        passwordError.textContent = '两次输入的密码不一致';
-                } else {
-                        passwordError.textContent = '';
+            // 确保至少选中一个角色
+            form.addEventListener('submit', function(event) {
+                const roleCheckboxes = document.querySelectorAll('input[name="roles"]:checked');
+                if (roleCheckboxes.length === 0) {
+                    event.preventDefault();
+                    alert('请至少选择一个用户角色');
+                    submitBtn.innerHTML = '保存修改';
+                    submitBtn.disabled = false;
                 }
             });
-            
-                // 用户名格式验证
-                usernameInput.addEventListener('input', function() {
-                    const usernamePattern = /^(?=.*[a-zA-Z])[a-zA-Z0-9]{3,15}$/;
-                    const usernameError = document.getElementById('username-error');
-                    
-                    if (!usernamePattern.test(this.value) && this.value.length > 0) {
-                        usernameError.textContent = '用户名格式不正确';
-                        usernameError.style.display = 'block';
-                    } else {
-                        usernameError.style.display = 'none';
-                    }
-                });
-                
-                // 手机号格式验证
-                phoneInput.addEventListener('input', function() {
-                    const phonePattern = /^[1-9]\d{10}$/;
-                    const phoneError = document.getElementById('phone-error');
-                    
-                    if (!phonePattern.test(this.value) && this.value.length > 0) {
-                        phoneError.textContent = '请输入11位有效手机号';
-                        phoneError.style.display = 'block';
-                    } else {
-                        phoneError.style.display = 'none';
-                    }
-                });
-                }
-                
-            // 表单整体验证
-            function validateForm() {
-                let isValid = true;
-                const passwordInput = document.querySelector('input[name="password"]');
-                const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
-                
-                // 验证密码匹配
-                if (confirmPasswordInput.value !== passwordInput.value) {
-                    const passwordError = document.getElementById('confirmPassword-error');
-                    passwordError.textContent = '两次输入的密码不一致';
-                    passwordError.style.display = 'block';
-                    confirmPasswordInput.focus();
-                    isValid = false;
-                }
-                
-                return isValid;
-                }
-                
-            setupFormValidation();
         });
     </script>
 </body>

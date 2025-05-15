@@ -3,6 +3,7 @@ package com.example.studentmanagementsystem.controller;
 import com.example.studentmanagementsystem.entity.Course;
 import com.example.studentmanagementsystem.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,18 +26,21 @@ public class CourseController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String showAddForm(Model model) {
         model.addAttribute("course", new Course());
         return "course/form";
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String addCourse(@ModelAttribute Course course) {
         courseService.saveCourse(course);
         return "redirect:/courses";
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String showEditForm(@PathVariable Long id, Model model) {
         Course course = courseService.getCourseById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid course Id:" + id));
@@ -45,6 +49,7 @@ public class CourseController {
     }
 
     @PostMapping("/edit/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String updateCourse(@PathVariable Long id, @ModelAttribute Course course) {
         course.setId(id);
         courseService.saveCourse(course);
@@ -52,6 +57,7 @@ public class CourseController {
     }
 
     @PostMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
         return "redirect:/courses";

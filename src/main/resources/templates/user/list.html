@@ -44,7 +44,7 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Users List</h2>
-            <a th:href="@{/users/register}" class="btn btn-info">
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/users/register}" class="btn btn-info">
                 <i class="bi bi-person-plus"></i> Add New User
             </a>
         </div>
@@ -88,7 +88,7 @@
                                           th:text="${user.enabled ? 'Active' : 'Inactive'}">Active</span>
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
+                                    <div sec:authorize="hasRole('ADMIN')" class="btn-group btn-group-sm">
                                         <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-primary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
@@ -97,6 +97,10 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
+                                    
+                                    <a sec:authorize="!hasRole('ADMIN')" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
                                     
                                     <!-- Delete Modal -->
                                     <div class="modal fade" th:id="'deleteModal' + ${user.id}" tabindex="-1">

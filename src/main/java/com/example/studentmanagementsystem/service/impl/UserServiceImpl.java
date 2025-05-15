@@ -25,6 +25,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateUser(User user) {
+        // 检查用户是否存在
+        if (!userRepository.existsById(user.getId())) {
+            throw new IllegalArgumentException("用户ID不存在：" + user.getId());
+        }
+        // 更新用户，但不更改密码
+        return userRepository.save(user);
+    }
+
+    @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
@@ -57,6 +67,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByIdCard(String idCard) {
         return userRepository.existsByIdCard(idCard);
+    }
+
+    @Override
+    public boolean existsByPhone(String phone) {
+        return userRepository.existsByPhone(phone);
     }
 
     @Override

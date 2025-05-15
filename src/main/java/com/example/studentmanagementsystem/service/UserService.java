@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface UserService {
     User saveUser(User user);
+    User updateUser(User user);
     Optional<User> getUserById(Long id);
     Optional<User> findByUsername(String username);
     List<User> getAllUsers();
@@ -13,5 +14,6 @@ public interface UserService {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByIdCard(String idCard);
+    boolean existsByPhone(String phone);
     long countUsers();
 } 

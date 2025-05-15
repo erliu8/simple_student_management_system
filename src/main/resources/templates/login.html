@@ -121,6 +121,9 @@
                 </div>
 
                 <form th:action="@{/login}" method="post">
+                    <!-- 添加隐藏字段存储验证码ID -->
+                    <input type="hidden" id="captchaId" name="captchaId" th:value="${captchaId}">
+                    
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <div class="input-group">
@@ -165,13 +168,8 @@
                 
                 <div class="register-now">
                     <p>Don't have an account?</p>
-                    <!-- Using a direct button to navigate -->
-                    <button id="registerButton" class="btn btn-success btn-register">Register Now</button>
-                    
-                    <!-- Alternative: Using a form approach -->
-                    <form th:action="@{/register}" method="get" class="mt-2" style="display: none;">
-                        <button type="submit" class="btn btn-success btn-register">Register (Alternative)</button>
-                    </form>
+                    <!-- 使用链接代替按钮 -->
+                    <a th:href="@{/register}" class="btn btn-success btn-register">Register Now</a>
                 </div>
             </div>
         </div>
@@ -182,6 +180,8 @@
         // 验证码刷新
         document.addEventListener('DOMContentLoaded', function() {
             const captchaBox = document.getElementById('captchaBox');
+            const captchaInput = document.getElementById('captcha');
+            const captchaIdInput = document.getElementById('captchaId');
             
             if (captchaBox) {
                 captchaBox.addEventListener('click', function() {
@@ -194,21 +194,19 @@
                     .then(response => response.json())
                     .then(data => {
                         captchaBox.textContent = data.captcha;
+                        // 更新隐藏的验证码ID
+                        if (captchaIdInput) {
+                            captchaIdInput.value = data.captchaId;
+                        }
+                        // 清空验证码输入框，确保用户重新输入新验证码
+                        if (captchaInput) {
+                            captchaInput.value = '';
+                            captchaInput.focus();
+                        }
                     })
                     .catch(error => {
                         console.error('Error refreshing captcha:', error);
                     });
-            }
-            
-            // Add event listener for register button
-            const registerButton = document.getElementById('registerButton');
-            if (registerButton) {
-                registerButton.addEventListener('click', function(event) {
-                    console.log('Register button clicked');
-                    
-                    // Navigate programmatically
-                    window.location.href = '/register';
-                });
             }
         });
     </script>

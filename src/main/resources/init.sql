@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS enrollments;
+DROP TABLE IF EXISTS notifications;
 
 -- Create tables
 -- Users table
@@ -85,6 +86,20 @@ CREATE TABLE IF NOT EXISTS system_logs (
     entity_id BIGINT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sender_username VARCHAR(50) NOT NULL,
+    recipient_id BIGINT,
+    entity_type VARCHAR(50),
+    entity_id BIGINT,
+    read_status BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Enrollments table

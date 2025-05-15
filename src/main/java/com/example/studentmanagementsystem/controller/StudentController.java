@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/students")
-@PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
 public class StudentController {
 
     private final StudentService studentService;
@@ -27,18 +26,21 @@ public class StudentController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String showAddForm(Model model) {
         model.addAttribute("student", new Student());
         return "student/form";
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String addStudent(@ModelAttribute Student student) {
         studentService.saveStudent(student);
         return "redirect:/students";
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String showEditForm(@PathVariable Long id, Model model) {
         Student student = studentService.getStudentById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid student Id:" + id));
@@ -47,6 +49,7 @@ public class StudentController {
     }
 
     @PostMapping("/edit/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String updateStudent(@PathVariable Long id, @ModelAttribute Student student) {
         student.setId(id);
         studentService.saveStudent(student);
@@ -54,6 +57,7 @@ public class StudentController {
     }
 
     @PostMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public String deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
         return "redirect:/students";
